@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestSetKV(t *testing.T) {
-	store := GetNewKV(0)
+	store := GetNewKV(1)
 
 	key := "hello"
 	value := "world"
@@ -23,7 +24,7 @@ func TestSetKV(t *testing.T) {
 }
 
 func TestGetKV(t *testing.T) {
-	store := GetNewKV(0)
+	store := GetNewKV(1)
 
 	key := "hello"
 	value := "world"
@@ -36,4 +37,25 @@ func TestGetKV(t *testing.T) {
 	expectedError := errors.New("Key doesn't exist")
 	assert.EqualError(t, err, expectedError.Error())
 
+}
+
+func TestKVCapBreach(t *testing.T) {
+	capacity := 4
+	store := GetNewKV(capacity)
+
+	for i := 0; i < capacity; i++ {
+		key := fmt.Sprintf("key:%d", i)
+		val := fmt.Sprintf("value:%d", i)
+
+		store.Set(key, val)
+	}
+
+	// capacity is breached for this kv pair
+	store.Set("key:4", "value4")
+
+	// if we check for key:0 then it should throw key not found error
+	val, err := store.Get("key:0")
+	expectedError := errors.New("Key doesn't exist")
+	require.Nil(t, val)
+	assert.EqualError(t, err, expectedError.Error())
 }
