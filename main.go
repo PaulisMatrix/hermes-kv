@@ -24,9 +24,6 @@ func GetNewKV(capacity int) *Store {
 
 func (s *Store) Set(key string, value interface{}) error {
 	// check the cur len > capacity, delete the head node.
-	fmt.Println("current capacity", s.FIFO.capacity)
-
-	// add node to the DLL
 	if s.FIFO.capacity >= s.capacity {
 		// evict the head node and update the capacity
 		fmt.Println("capacity breached, deleting head node...")
@@ -35,6 +32,7 @@ func (s *Store) Set(key string, value interface{}) error {
 		delete(s.KVMap, node.key)
 	}
 
+	// add node to the DLL
 	newNode := s.FIFO.addNode(key, value)
 	// key -> nodeRef
 	s.KVMap[key] = newNode
@@ -63,12 +61,13 @@ type Store struct {
 }
 
 func main() {
-	s := GetNewKV(1)
+	s := GetNewKV(2)
 
 	s.Set("hello", "world")
 	s.Set("first", 100)
+	s.Set("second", 200)
 
-	val, err := s.Get("hello")
+	val, err := s.Get("first")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
