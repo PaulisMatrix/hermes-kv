@@ -59,3 +59,16 @@ func TestKVCapBreach(t *testing.T) {
 	require.Nil(t, val)
 	assert.EqualError(t, err, expectedError.Error())
 }
+
+func TestZeroCapKV(t *testing.T) {
+	capacity := 0
+
+	var f assert.PanicTestFunc
+
+	f = func() {
+		s := GetNewKV(capacity)
+		s.Set("hello", "world")
+	}
+
+	require.Panics(t, f)
+}

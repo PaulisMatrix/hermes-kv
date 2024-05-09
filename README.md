@@ -13,7 +13,7 @@ DLL for O(1) eviction. Deleting the head which is the first key stored so eligib
 Adding a new node is also O(1) since we are maintaining prev pointer in a doubly linked list.
 
 ```
-❯ go test ./... -v --cover
+❯ go test ./... -v -cover
 === RUN   TestDLLSet
 current node val:  100
 current node val:  101
@@ -30,7 +30,9 @@ current node val:  102
 === RUN   TestKVCapBreach
 capacity breached, deleting head node...
 --- PASS: TestKVCapBreach (0.00s)
+=== RUN   TestZeroCapKV
+--- PASS: TestZeroCapKV (0.00s)
 PASS
-coverage: 81.5% of statements
-ok  	ravenmail	0.407s	coverage: 81.5% of statements
+coverage: 82.1% of statements
+ok  	ravenmail	0.364s	coverage: 82.1% of statements
 ```
