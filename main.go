@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 )
 
 type StoreIface interface {
@@ -22,11 +23,16 @@ func GetNewKV(capacity int) *Store {
 		KVMap:    make(map[string]interface{}, capacity),
 		FIFO:     getDLL(),
 		capacity: capacity,
+		RWMutex:  sync.RWMutex{},
 	}
 	return s
 }
 
 func (s *Store) Set(key string, value interface{}) error {
+	// take writer lock while adding to the cache
+	s.RWMutex.Lock()
+	defer s.RWMutex.Unlock()
+
 	// check the cur len > capacity, delete the head node.
 	if s.FIFO.capacity >= s.capacity {
 		// evict the head node and update the capacity
@@ -45,6 +51,10 @@ func (s *Store) Set(key string, value interface{}) error {
 }
 
 func (s *Store) Get(key string) (interface{}, error) {
+	// shared reader lock for accessing the cache
+	s.RWMutex.RLock()
+	defer s.RWMutex.RUnlock()
+
 	nodeRef, ok := s.KVMap[key]
 
 	if !ok {
@@ -58,6 +68,7 @@ func (s *Store) Get(key string) (interface{}, error) {
 
 type Store struct {
 	// store the key value pairs
+	sync.RWMutex
 	KVMap    map[string]interface{}
 	FIFO     *DoublyLinkedList
 	capacity int

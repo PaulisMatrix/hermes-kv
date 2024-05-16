@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -71,4 +73,45 @@ func TestZeroCapKV(t *testing.T) {
 	}
 
 	require.Panics(t, f)
+}
+
+func TestKVRacer(t *testing.T) {
+	capacity := 5
+	var wg sync.WaitGroup
+
+	store := GetNewKV(capacity)
+
+	// set values
+	for i := 0; i < capacity; i++ {
+		wg.Add(1)
+		go func(store *Store, id int) {
+			defer wg.Done()
+
+			key := fmt.Sprintf("key:%d", id)
+			value := fmt.Sprintf("value:%d", id)
+			err := store.Set(key, value)
+			require.Nil(t, err)
+
+		}(store, i)
+	}
+
+	// wait for keys to store
+	time.Sleep(2 * time.Second)
+
+	// get values
+	for i := 0; i < capacity; i++ {
+		wg.Add(1)
+		go func(store *Store, id int) {
+			defer wg.Done()
+
+			key := fmt.Sprintf("key:%d", id)
+			val, err := store.Get(key)
+			fmt.Printf("value got: %+v\n", val)
+			require.Nil(t, err)
+
+		}(store, i)
+	}
+
+	wg.Wait()
+
 }
