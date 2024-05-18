@@ -43,3 +43,7 @@ PASS
 coverage: 83.3% of statements
 ok  	ravenmail	3.402s	coverage: 83.3% of statements
 ```
+
+* References on In-memory cache:
+  * https://github.com/patrickmn/go-cache/
+  * 
