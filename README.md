@@ -33,11 +33,13 @@ capacity breached, deleting head node...
 --- PASS: TestKVCapBreach (0.00s)
 === RUN   TestZeroCapKV
 --- PASS: TestZeroCapKV (0.00s)
-=== RUN   TestKVRacer
---- PASS: TestKVRacer (2.00s)
+=== RUN   TestKVSetRacer
+--- PASS: TestKVSetRacer (2.00s)
+=== RUN   TestKVDeleteRacer
+--- PASS: TestKVDeleteRacer (2.00s)
 PASS
-coverage: 79.5% of statements
-ok  	ravenmail	3.183s	coverage: 79.5% of statements
+coverage: 80.2% of statements
+ok  	ravenmail	5.453s	coverage: 80.2% of statements
 
 -- generate and open the cover profile
 go tool cover -html cover.out -o cover.html

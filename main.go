@@ -81,6 +81,10 @@ func (s *Store) Get(key string) (interface{}, error) {
 }
 
 func (s *Store) Delete(key string) error {
+	// take writer lock while deleting from the cache
+	s.RWMutex.Lock()
+	defer s.RWMutex.Unlock()
+
 	nodeRef, ok := s.KVMap[key]
 	if !ok {
 		return errors.New("Key doesn't exist")
