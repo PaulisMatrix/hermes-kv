@@ -27,37 +27,11 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
   * https://github.com/patrickmn/go-cache/
   * 
 
-**Current tests:**
+**Misc:**
 ```
-❯ go test ./... -v -cover -race -coverprofile cover.out    
-?   	hermeskv/examples	[no test files]
-=== RUN   TestDLLSet
---- PASS: TestDLLSet (0.00s)
-=== RUN   TestDLLDeleteHead
---- PASS: TestDLLDeleteHead (0.00s)
-=== RUN   TestDLLDeleteTail
---- PASS: TestDLLDeleteTail (0.00s)
-=== RUN   TestDLLDeleteNode
---- PASS: TestDLLDeleteNode (0.00s)
-=== RUN   TestSetKV
---- PASS: TestSetKV (0.00s)
-=== RUN   TestGetKV
---- PASS: TestGetKV (0.00s)
-=== RUN   TestDeleteKV
---- PASS: TestDeleteKV (0.00s)
-=== RUN   TestKVCapBreach
---- PASS: TestKVCapBreach (0.00s)
-=== RUN   TestZeroCapKV
---- PASS: TestZeroCapKV (0.00s)
-=== RUN   TestKVSetRacer
---- PASS: TestKVSetRacer (2.00s)
-=== RUN   TestKVDeleteRacer
---- PASS: TestKVDeleteRacer (2.00s)
-PASS
-coverage: 90.3% of statements
-ok  	hermeskv	5.640s	coverage: 90.3% of statements
-
 -- generate and open the cover profile
-go tool cover -html cover.out -o cover.html
-open cover.html
+
+❯ go test ./... -v -cover -race -coverprofile cover.out
+❯ go tool cover -html cover.out -o cover.html
+❯ open cover.html
 ```
