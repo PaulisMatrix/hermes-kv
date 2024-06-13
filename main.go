@@ -19,6 +19,7 @@ type Store struct {
 type StoreIface interface {
 	Set(key string, value interface{}) error
 	Get(key string) (interface{}, error)
+	Delete(key string) error
 }
 
 var _ StoreIface = (*Store)(nil)
@@ -55,7 +56,8 @@ func (s *Store) Set(key string, value interface{}) error {
 	}
 
 	// add node to the DLL
-	newNode := s.FIFO.addNode(key, value)
+	node := getNode(key, value, nil, nil)
+	newNode := s.FIFO.addNode(node)
 	// key -> nodeRef
 	s.KVMap[key] = newNode
 
@@ -76,6 +78,20 @@ func (s *Store) Get(key string) (interface{}, error) {
 	node := nodeRef.(*Node)
 
 	return node.val, nil
+}
+
+func (s *Store) Delete(key string) error {
+	nodeRef, ok := s.KVMap[key]
+	if !ok {
+		return errors.New("Key doesn't exist")
+	}
+	node := nodeRef.(*Node)
+
+	// delete from the map and from the DLL
+	delete(s.KVMap, key)
+	s.FIFO.deleteNode(node)
+
+	return nil
 }
 
 func main() {

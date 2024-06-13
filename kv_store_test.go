@@ -41,6 +41,24 @@ func TestGetKV(t *testing.T) {
 
 }
 
+func TestDeleteKV(t *testing.T) {
+	store := GetNewKV(1)
+
+	key := "hello"
+	value := "world"
+
+	store.Set(key, value)
+
+	err := store.Delete(key)
+	require.Nil(t, err)
+
+	_, err = store.Get(key)
+	require.NotNil(t, err)
+	expectedError := errors.New("Key doesn't exist")
+	assert.EqualError(t, err, expectedError.Error())
+
+}
+
 func TestKVCapBreach(t *testing.T) {
 	capacity := 4
 	store := GetNewKV(capacity)
@@ -105,8 +123,7 @@ func TestKVRacer(t *testing.T) {
 			defer wg.Done()
 
 			key := fmt.Sprintf("key:%d", id)
-			val, err := store.Get(key)
-			fmt.Printf("value got: %+v\n", val)
+			_, err := store.Get(key)
 			require.Nil(t, err)
 
 		}(store, i)

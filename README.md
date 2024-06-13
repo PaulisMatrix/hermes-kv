@@ -13,28 +13,37 @@ DLL for O(1) eviction. Deleting the head which is the first key stored so eligib
 Adding a new node is also O(1) since we are maintaining prev pointer in a doubly linked list.
 
 ```
-❯ go test ./... -v -cover -race                          
+❯ go test ./... -v -cover -race -coverprofile cover.out    
 === RUN   TestDLLSet
 --- PASS: TestDLLSet (0.00s)
 === RUN   TestDLLDeleteHead
 --- PASS: TestDLLDeleteHead (0.00s)
+=== RUN   TestDLLDeleteTail
+--- PASS: TestDLLDeleteTail (0.00s)
+=== RUN   TestDLLDeleteNode
+--- PASS: TestDLLDeleteNode (0.00s)
 === RUN   TestSetKV
 --- PASS: TestSetKV (0.00s)
 === RUN   TestGetKV
 --- PASS: TestGetKV (0.00s)
+=== RUN   TestDeleteKV
+--- PASS: TestDeleteKV (0.00s)
 === RUN   TestKVCapBreach
 capacity breached, deleting head node...
 --- PASS: TestKVCapBreach (0.00s)
 === RUN   TestZeroCapKV
 --- PASS: TestZeroCapKV (0.00s)
 === RUN   TestKVRacer
-value got: value:2
-value got: value:0
-value got: value:4
-value got: value:3
-value got: value:1
 --- PASS: TestKVRacer (2.00s)
 PASS
-coverage: 75.9% of statements
-ok  	ravenmail	3.520s	coverage: 75.9% of statements
+coverage: 79.5% of statements
+ok  	ravenmail	3.183s	coverage: 79.5% of statements
+
+-- generate and open the cover profile
+go tool cover -html cover.out -o cover.html
+open cover.html
 ```
+
+**References on In-memory cache:**
+  * https://github.com/patrickmn/go-cache/
+  * 

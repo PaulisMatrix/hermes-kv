@@ -44,8 +44,7 @@ func getDLL() *DoublyLinkedList {
 	return dll
 }
 
-func (dll *DoublyLinkedList) addNode(key string, val interface{}) *Node {
-	newNode := getNode(key, val, nil, nil)
+func (dll *DoublyLinkedList) addNode(newNode *Node) *Node {
 	dll.capacity++
 
 	// insert in between tail and head
@@ -83,6 +82,7 @@ func (dll *DoublyLinkedList) getNode(val interface{}) (*Node, error) {
 
 // pop the head node everytime
 func (dll *DoublyLinkedList) deleteHead() *Node {
+	dll.capacity--
 
 	head := dll.headNode.next
 	dll.headNode.next = head.next
@@ -90,7 +90,27 @@ func (dll *DoublyLinkedList) deleteHead() *Node {
 	return head
 }
 
+// pop the tail node everytime
+func (dll *DoublyLinkedList) deleteTail() *Node {
+	dll.capacity--
+
+	tail := dll.tailNode.prev
+	tail.prev.next = dll.tailNode
+	dll.tailNode.prev = tail.prev
+	return tail
+}
+
 // delete a specifc node
 func (dll *DoublyLinkedList) deleteNode(node *Node) {
-
+	if node.prev.prev == nil {
+		// if head node
+		dll.deleteHead()
+	} else if node.next.next == nil {
+		// if tail node
+		dll.deleteTail()
+	} else {
+		prevNode := node.prev
+		prevNode.next = node.next
+		node.next.prev = node.prev
+	}
 }
