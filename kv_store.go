@@ -1,9 +1,7 @@
-package main
+package ravenmail
 
 import (
 	"errors"
-	"fmt"
-	"os"
 	"sync"
 )
 
@@ -48,9 +46,8 @@ func (s *Store) Set(key string, value interface{}) error {
 
 	// check the cur len > capacity, delete the head node.
 	if s.FIFO.capacity >= s.capacity {
+		// TODO: can we do this in a background thread?
 		// evict the head node and update the capacity
-		fmt.Println("capacity breached, deleting head node...")
-		// how to get the key
 		node := s.FIFO.deleteHead()
 		delete(s.KVMap, node.key)
 	}
@@ -96,19 +93,4 @@ func (s *Store) Delete(key string) error {
 	s.FIFO.deleteNode(node)
 
 	return nil
-}
-
-func main() {
-	s := GetNewKV(2)
-
-	s.Set("hello", "world")
-	s.Set("first", 100)
-	s.Set("second", 200)
-
-	val, err := s.Get("first")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println("value received: ", val)
 }

@@ -14,6 +14,7 @@ Adding a new node is also O(1) since we are maintaining prev pointer in a doubly
 
 ```
 ❯ go test ./... -v -cover -race -coverprofile cover.out    
+?   	ravenmail/examples	[no test files]
 === RUN   TestDLLSet
 --- PASS: TestDLLSet (0.00s)
 === RUN   TestDLLDeleteHead
@@ -29,7 +30,6 @@ Adding a new node is also O(1) since we are maintaining prev pointer in a doubly
 === RUN   TestDeleteKV
 --- PASS: TestDeleteKV (0.00s)
 === RUN   TestKVCapBreach
-capacity breached, deleting head node...
 --- PASS: TestKVCapBreach (0.00s)
 === RUN   TestZeroCapKV
 --- PASS: TestZeroCapKV (0.00s)
@@ -38,13 +38,16 @@ capacity breached, deleting head node...
 === RUN   TestKVDeleteRacer
 --- PASS: TestKVDeleteRacer (2.00s)
 PASS
-coverage: 80.2% of statements
-ok  	ravenmail	5.453s	coverage: 80.2% of statements
+coverage: 88.9% of statements
+ok  	ravenmail	5.539s	coverage: 88.9% of statements
 
 -- generate and open the cover profile
 go tool cover -html cover.out -o cover.html
 open cover.html
 ```
+
+**KV store with transactions:**
+
 
 **References on In-memory cache:**
   * https://github.com/patrickmn/go-cache/
