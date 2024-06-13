@@ -15,8 +15,6 @@ func TestDLLSet(t *testing.T) {
 	newDLL.addNode("s", 101)
 	newDLL.addNode("t", 102)
 
-	newDLL.display()
-
 	// search for 102
 	node, err := newDLL.getNode(102)
 	require.Nil(t, err)
@@ -25,7 +23,7 @@ func TestDLLSet(t *testing.T) {
 
 }
 
-func TestDLLDelete(t *testing.T) {
+func TestDLLDeleteHead(t *testing.T) {
 	newDLL := getDLL()
 
 	// add node
@@ -34,9 +32,7 @@ func TestDLLDelete(t *testing.T) {
 	newDLL.addNode("t", 102)
 
 	// delete the head node
-	node := newDLL.deleteNode()
-
-	newDLL.display()
+	node := newDLL.deleteHead()
 
 	assert.EqualValues(t, node.val, 100)
 

@@ -13,16 +13,11 @@ DLL for O(1) eviction. Deleting the head which is the first key stored so eligib
 Adding a new node is also O(1) since we are maintaining prev pointer in a doubly linked list.
 
 ```
-❯ go test ./... -v -cover -race
+❯ go test ./... -v -cover -race                          
 === RUN   TestDLLSet
-current node val:  100
-current node val:  101
-current node val:  102
 --- PASS: TestDLLSet (0.00s)
-=== RUN   TestDLLDelete
-current node val:  101
-current node val:  102
---- PASS: TestDLLDelete (0.00s)
+=== RUN   TestDLLDeleteHead
+--- PASS: TestDLLDeleteHead (0.00s)
 === RUN   TestSetKV
 --- PASS: TestSetKV (0.00s)
 === RUN   TestGetKV
@@ -33,17 +28,13 @@ capacity breached, deleting head node...
 === RUN   TestZeroCapKV
 --- PASS: TestZeroCapKV (0.00s)
 === RUN   TestKVRacer
-value got: value:1
-value got: value:3
 value got: value:2
-value got: value:4
 value got: value:0
+value got: value:4
+value got: value:3
+value got: value:1
 --- PASS: TestKVRacer (2.00s)
 PASS
-coverage: 83.3% of statements
-ok  	ravenmail	3.402s	coverage: 83.3% of statements
+coverage: 75.9% of statements
+ok  	ravenmail	3.520s	coverage: 75.9% of statements
 ```
-
-* References on In-memory cache:
-  * https://github.com/patrickmn/go-cache/
-  * 

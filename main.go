@@ -7,6 +7,15 @@ import (
 	"sync"
 )
 
+type Store struct {
+	// store the key value pairs
+	sync.RWMutex
+	KVMap    map[string]interface{}
+	FIFO     *DoublyLinkedList
+	capacity int
+	StoreIface
+}
+
 type StoreIface interface {
 	Set(key string, value interface{}) error
 	Get(key string) (interface{}, error)
@@ -19,6 +28,9 @@ func GetNewKV(capacity int) *Store {
 		panic("cache capacity cant be zero")
 	}
 
+	// map[key] = val
+	// key = string
+	// val = nodeRef stored in the DLL
 	s := &Store{
 		KVMap:    make(map[string]interface{}, capacity),
 		FIFO:     getDLL(),
@@ -38,7 +50,7 @@ func (s *Store) Set(key string, value interface{}) error {
 		// evict the head node and update the capacity
 		fmt.Println("capacity breached, deleting head node...")
 		// how to get the key
-		node := s.FIFO.deleteNode()
+		node := s.FIFO.deleteHead()
 		delete(s.KVMap, node.key)
 	}
 
@@ -64,15 +76,6 @@ func (s *Store) Get(key string) (interface{}, error) {
 	node := nodeRef.(*Node)
 
 	return node.val, nil
-}
-
-type Store struct {
-	// store the key value pairs
-	sync.RWMutex
-	KVMap    map[string]interface{}
-	FIFO     *DoublyLinkedList
-	capacity int
-	StoreIface
 }
 
 func main() {

@@ -22,17 +22,24 @@ func getNode(key string, val interface{}, prev, next *Node) *Node {
 }
 
 type DoublyLinkedList struct {
-	curNode  *Node
+	// head and tail nodes are basically the boundaries pointing to the first and last element
 	headNode *Node
+	tailNode *Node
 	capacity int
 }
 
 func getDLL() *DoublyLinkedList {
 	dll := &DoublyLinkedList{
-		curNode:  nil,
-		headNode: nil,
+		headNode: getNode("headNode", -1, nil, nil),
+		tailNode: getNode("tailNode", -1, nil, nil),
 		capacity: 0,
 	}
+	// init head and tail nodes
+	dll.headNode.prev = nil
+	dll.headNode.next = dll.tailNode
+
+	dll.tailNode.next = nil
+	dll.tailNode.prev = dll.headNode
 
 	return dll
 }
@@ -41,25 +48,12 @@ func (dll *DoublyLinkedList) addNode(key string, val interface{}) *Node {
 	newNode := getNode(key, val, nil, nil)
 	dll.capacity++
 
-	// adding first node
-	if dll.curNode == nil {
-		dll.curNode = newNode
-		dll.curNode.next = nil
-		dll.curNode.prev = nil
-
-		dll.headNode = dll.curNode
-		return newNode
-	}
-
-	dll.curNode.next = newNode
-	newNode.prev = dll.curNode
-	newNode.next = nil
-	dll.curNode = newNode
-
-	// <- head -> tail ->
-	// <-head<-100 -><-tail
-	// <-head<-100 -><-200 300
-
+	// insert in between tail and head
+	prevNode := dll.tailNode.prev
+	dll.tailNode.prev = newNode
+	newNode.next = dll.tailNode
+	newNode.prev = prevNode
+	prevNode.next = newNode
 	return newNode
 
 }
@@ -88,13 +82,15 @@ func (dll *DoublyLinkedList) getNode(val interface{}) (*Node, error) {
 }
 
 // pop the head node everytime
-func (dll *DoublyLinkedList) deleteNode() *Node {
+func (dll *DoublyLinkedList) deleteHead() *Node {
 
-	// update the head pointer to point to its next node now
-	head := dll.headNode
-	nextNode := dll.headNode.next
-	dll.headNode = nextNode
-
-	dll.capacity--
+	head := dll.headNode.next
+	dll.headNode.next = head.next
+	head.next.prev = dll.headNode
 	return head
+}
+
+// delete a specifc node
+func (dll *DoublyLinkedList) deleteNode(node *Node) {
+
 }
