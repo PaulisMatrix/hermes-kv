@@ -102,6 +102,8 @@ func (dll *DoublyLinkedList) deleteTail() *Node {
 
 // delete a specifc node
 func (dll *DoublyLinkedList) deleteNode(node *Node) {
+	dll.capacity--
+
 	if node.prev.prev == nil {
 		// if head node
 		dll.deleteHead()
