@@ -1,4 +1,4 @@
-module ravenmail
+module hermeskv
 
 go 1.21.1
 

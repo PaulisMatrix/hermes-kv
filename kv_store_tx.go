@@ -1,4 +1,4 @@
-package ravenmail
+package hermeskv
 
 type StoreTx struct {
 	store *Store

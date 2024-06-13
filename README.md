@@ -1,20 +1,36 @@
-**Implement a Basic Cache:**
+**Hermes KV**:
 
-1. Design a simple in-memory cache system for storing key-value pairs.
-2. Implement **`Set(key string, value interface{})`** and **`Get(key string) interface{}`** methods.
+Why **Hermes**?
 
-**Implement FIFO Eviction Policy:**
+Cause Hermes is the Greek god of commerce, communication, and the messenger of the gods. This name suggests speed and efficiency in data retrieval and storage. ^^thanks to gpt for the name.
 
-1. Extend the basic cache to incorporate the First-In-First-Out (FIFO) eviction policy.
-2. Implement the cache to evict the oldest item first when the cache reaches its predefined capacity.
+**Basic KV Stores:**
 
-map for O(1) key access
-DLL for O(1) eviction. Deleting the head which is the first key stored so eligible for eviction.
-Adding a new node is also O(1) since we are maintaining prev pointer in a doubly linked list.
+1.  A simple in-memory cache system for storing key-value pairs.
+2.  Supported methods:
+    * `Set(key string, value interface{}) error` 
+    * `Get(key string) (interface{}, error)`
+    * `Delete(key string) error`
 
+**FIFO Eviction Policy:**
+
+1.  Extending the basic cache to incorporate the First-In-First-Out (FIFO) eviction policy.
+2.  Implement the cache to evict the oldest item first when the cache reaches its predefined capacity.
+3.  map for O(1) key access
+4.  Doubly linked list for O(1) eviction. Deleting the head which is the first key stored so eligible for eviction.
+    Adding a new node is also O(1) since we are maintaining prev pointer in a doubly linked list.
+
+**KV store with transactions:**
+
+
+**References on In-memory cache:**
+  * https://github.com/patrickmn/go-cache/
+  * 
+
+**Current tests:**
 ```
 ❯ go test ./... -v -cover -race -coverprofile cover.out    
-?   	ravenmail/examples	[no test files]
+?   	hermeskv/examples	[no test files]
 === RUN   TestDLLSet
 --- PASS: TestDLLSet (0.00s)
 === RUN   TestDLLDeleteHead
@@ -38,17 +54,10 @@ Adding a new node is also O(1) since we are maintaining prev pointer in a doubly
 === RUN   TestKVDeleteRacer
 --- PASS: TestKVDeleteRacer (2.00s)
 PASS
-coverage: 88.9% of statements
-ok  	ravenmail	5.539s	coverage: 88.9% of statements
+coverage: 90.3% of statements
+ok  	hermeskv	5.640s	coverage: 90.3% of statements
 
 -- generate and open the cover profile
 go tool cover -html cover.out -o cover.html
 open cover.html
 ```
-
-**KV store with transactions:**
-
-
-**References on In-memory cache:**
-  * https://github.com/patrickmn/go-cache/
-  * 

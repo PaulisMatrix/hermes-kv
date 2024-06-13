@@ -1,4 +1,4 @@
-package ravenmail
+package hermeskv
 
 import (
 	"errors"

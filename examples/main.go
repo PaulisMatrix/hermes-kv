@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"hermeskv"
 	"os"
-	"ravenmail"
 )
 
 func main() {
-	s := ravenmail.GetNewKV(2)
+	s := hermeskv.GetNewKV(2)
 
 	s.Set("hello", "world")
 	s.Set("first", 100)
