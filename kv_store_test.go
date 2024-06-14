@@ -1,7 +1,6 @@
 package hermeskv
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 	"testing"
@@ -36,7 +35,7 @@ func TestGetKV(t *testing.T) {
 
 	_, err := store.Get(invalidKey)
 	require.NotNil(t, err)
-	expectedError := errors.New("Key doesn't exist")
+	expectedError := ErrNoKey
 	assert.EqualError(t, err, expectedError.Error())
 
 }
@@ -54,7 +53,7 @@ func TestDeleteKV(t *testing.T) {
 
 	_, err = store.Get(key)
 	require.NotNil(t, err)
-	expectedError := errors.New("Key doesn't exist")
+	expectedError := ErrNoKey
 	assert.EqualError(t, err, expectedError.Error())
 
 }
@@ -75,7 +74,7 @@ func TestKVCapBreach(t *testing.T) {
 
 	// if we check for key:0 then it should throw key not found error
 	val, err := store.Get("key:0")
-	expectedError := errors.New("Key doesn't exist")
+	expectedError := ErrNoKey
 	require.Nil(t, val)
 	assert.EqualError(t, err, expectedError.Error())
 }

@@ -1,7 +1,6 @@
 package hermeskv
 
 import (
-	"errors"
 	"sync"
 )
 
@@ -69,7 +68,7 @@ func (s *Store) Get(key string) (interface{}, error) {
 	nodeRef, ok := s.KVMap[key]
 
 	if !ok {
-		return nil, errors.New("Key doesn't exist")
+		return nil, ErrNoKey
 	}
 
 	node := nodeRef.(*Node)
@@ -84,7 +83,7 @@ func (s *Store) Delete(key string) error {
 
 	nodeRef, ok := s.KVMap[key]
 	if !ok {
-		return errors.New("Key doesn't exist")
+		return ErrNoKey
 	}
 	node := nodeRef.(*Node)
 

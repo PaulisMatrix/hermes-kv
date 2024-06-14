@@ -21,7 +21,7 @@ func TestDLLSet(t *testing.T) {
 	newDLL.addNode(n3)
 
 	// search for 102
-	node, err := newDLL.getNode(102)
+	node, err := newDLL.retrieveNode(102)
 	require.Nil(t, err)
 
 	assert.EqualValues(t, 102, node.val)

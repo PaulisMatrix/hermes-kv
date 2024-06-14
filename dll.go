@@ -1,7 +1,6 @@
 package hermeskv
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -67,7 +66,7 @@ func (dll *DoublyLinkedList) display() {
 
 }
 
-func (dll *DoublyLinkedList) getNode(val interface{}) (*Node, error) {
+func (dll *DoublyLinkedList) retrieveNode(val interface{}) (*Node, error) {
 	// linear
 
 	curNode := dll.headNode
@@ -77,7 +76,7 @@ func (dll *DoublyLinkedList) getNode(val interface{}) (*Node, error) {
 		}
 		curNode = curNode.next
 	}
-	return nil, errors.New("node not found")
+	return nil, ErrNoNode
 }
 
 // pop the head node everytime

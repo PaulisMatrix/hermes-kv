@@ -1,12 +1,14 @@
 package hermeskv
 
 type StoreTx struct {
-	store *Store
+	store      *Store
+	isTxActive bool
 }
 
 func getStoreWithTx(capacity int) *StoreTx {
 	return &StoreTx{
-		store: GetNewKV(capacity),
+		store:      GetNewKV(capacity),
+		isTxActive: false,
 	}
 }
 
