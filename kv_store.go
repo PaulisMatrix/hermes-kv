@@ -4,12 +4,16 @@ import (
 	"sync"
 )
 
+type ValMetaDeta struct {
+	value       interface{}
+	isTombStone bool
+}
 type Store struct {
 	// store the key value pairs
 	sync.RWMutex
-	KVMap    map[string]interface{}
-	FIFO     *DoublyLinkedList
-	capacity int
+	globalState map[string]*ValMetaDeta
+	FIFO        *DoublyLinkedList
+	capacity    int
 	StoreIface
 }
 
@@ -30,10 +34,10 @@ func GetNewKV(capacity int) *Store {
 	// key = string
 	// val = nodeRef stored in the DLL
 	s := &Store{
-		KVMap:    make(map[string]interface{}, capacity),
-		FIFO:     getDLL(),
-		capacity: capacity,
-		RWMutex:  sync.RWMutex{},
+		globalState: make(map[string]*ValMetaDeta),
+		FIFO:        getDLL(),
+		capacity:    capacity,
+		RWMutex:     sync.RWMutex{},
 	}
 	return s
 }
@@ -48,14 +52,17 @@ func (s *Store) Set(key string, value interface{}) error {
 		// TODO: can we do this in a background thread?
 		// evict the head node and update the capacity
 		node := s.FIFO.deleteHead()
-		delete(s.KVMap, node.key)
+		delete(s.globalState, node.key)
 	}
 
 	// add node to the DLL
 	node := getNode(key, value, nil, nil)
 	newNode := s.FIFO.addNode(node)
-	// key -> nodeRef
-	s.KVMap[key] = newNode
+	s.globalState[key] = &ValMetaDeta{
+		// for globalState, value is the node reference in the doubly linked list.
+		value:       newNode,
+		isTombStone: false,
+	}
 
 	return nil
 }
@@ -65,14 +72,13 @@ func (s *Store) Get(key string) (interface{}, error) {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 
-	nodeRef, ok := s.KVMap[key]
+	valMeta, ok := s.globalState[key]
 
-	if !ok {
+	if !ok || valMeta.isTombStone {
 		return nil, ErrNoKey
 	}
 
-	node := nodeRef.(*Node)
-
+	node := valMeta.value.(*Node)
 	return node.val, nil
 }
 
@@ -81,14 +87,14 @@ func (s *Store) Delete(key string) error {
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
 
-	nodeRef, ok := s.KVMap[key]
-	if !ok {
+	valMeta, ok := s.globalState[key]
+	if !ok || valMeta.isTombStone {
 		return ErrNoKey
 	}
-	node := nodeRef.(*Node)
+	node := valMeta.value.(*Node)
 
-	// delete from the map and from the DLL
-	delete(s.KVMap, key)
+	// for the globalState, we aren't marking it as a tombStone but actually deleting it.
+	delete(s.globalState, key)
 	s.FIFO.deleteNode(node)
 
 	return nil

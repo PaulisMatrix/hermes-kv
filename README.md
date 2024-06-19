@@ -22,7 +22,22 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
 
 **KV store with transactions:**
 
+* Basic assumptions:
+  1. Only one transaction can be issued at a time. Assume no concurrent transactions.
+  2. `commit()` or `rollback` can be called only once in a transaction. You can specify n number of operations in between enclosed in between `begin()` and `end()`
+  3. Let's not consider nested transactions for now.
 
+* Implementation details:
+  1. Maintain a `tempKVMap` recording all the db changes. 
+  2. On `commit()`, iterate over all k,v pairs `O(N)` and call `Set(k, v)` of the underlying main KV store to record the final changes.
+  3. On `rollback()`, delete the `tempKVMap` altogether. 
+  4. Use flag `isTxActive` to check which Map to refer whenever any method is called.
+  5. For `delete()`, maintain a `isTombStone` boolean to mark a kv pair as deleted in localState. On `commit()`, call the actual `delete()` method to delete it from the globalState. On `rollback()`, nothing needs to be done, just clear the localState.
+
+* References:
+  1. https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
+  2. 
+  
 **References on In-memory cache:**
   * https://github.com/patrickmn/go-cache/
   * 
