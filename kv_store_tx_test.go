@@ -74,3 +74,56 @@ func TestSet2KVWithTx(t *testing.T) {
 	assert.EqualValues(t, "val1", val)
 
 }
+
+func TestDelete1KVWithTx(t *testing.T) {
+	// * Set key0 to val0
+	// * Get key0
+	//   * Expect val0
+	// * Begin transaction
+	// * Within transaction: Get key0
+	//   * Expect val0
+	// * Within transaction: Delete key0
+	// * Within transaction: Get key0
+	//   * Expect an error case as key0 is not set
+	// * Commit transaction
+	// * From the global state: Get key0
+	//   * Expect an error case as key0 is not set
+
+	capacity := 10
+	expectedError := ErrNoKey
+	storeWithTx := getStoreWithTx(capacity)
+
+	storeWithTx.Set("key0", "val0")
+	val, err := storeWithTx.Get("key0")
+	require.Nil(t, err)
+	assert.EqualValues(t, "val0", val)
+
+	storeWithTx.Begin()
+
+	val, err = storeWithTx.Get("key0")
+	require.Nil(t, err)
+	assert.EqualValues(t, "val0", val)
+
+	storeWithTx.Delete("key0")
+	_, err = storeWithTx.Get("key0")
+	require.NotNil(t, err)
+	assert.EqualError(t, err, expectedError.Error())
+
+	storeWithTx.Commit()
+	storeWithTx.End()
+
+	_, err = storeWithTx.Get("key0")
+	require.NotNil(t, err)
+	assert.EqualError(t, err, expectedError.Error())
+
+	storeWithTx.Set("key1", "val1")
+	val, err = storeWithTx.Get("key1")
+	require.Nil(t, err)
+	assert.EqualValues(t, "val1", val)
+
+	storeWithTx.Delete("key1")
+	_, err = storeWithTx.Get("key1")
+	require.NotNil(t, err)
+	assert.EqualError(t, err, expectedError.Error())
+
+}

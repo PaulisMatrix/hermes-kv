@@ -43,6 +43,11 @@ func (stx *StoreWithTx) Get(key string) (interface{}, error) {
 			return val, nil
 		}
 
+		// check if key is already marked as tombStone
+		if valMeta.isTombStone {
+			return "", ErrNoKey
+		}
+
 		return valMeta.value, nil
 	}
 	return stx.store.Get(key)
