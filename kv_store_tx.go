@@ -1,7 +1,7 @@
 package hermeskv
 
 type StoreWithTx struct {
-	store      *Store
+	store      StoreIface
 	localState map[string]*ValMetaDeta
 	isTxActive bool
 }
@@ -16,7 +16,7 @@ func getStoreWithTx(capacity int) *StoreWithTx {
 }
 
 func (stx *StoreWithTx) Set(key string, value interface{}) error {
-	// check if tx is active, if yes, route all ops to tempstate map
+	// check if tx is active, if yes, route all ops to localState map
 	if stx.isTxActive {
 		stx.localState[key] = &ValMetaDeta{
 			// for localState, value is the actual value being stored.

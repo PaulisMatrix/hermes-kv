@@ -14,9 +14,9 @@ type Store struct {
 	globalState map[string]*ValMetaDeta
 	FIFO        *DoublyLinkedList
 	capacity    int
-	StoreIface
 }
 
+//go:generate mockgen -destination=./mocks/mock_store.go -package=mocks hermeskv StoreIface
 type StoreIface interface {
 	Set(key string, value interface{}) error
 	Get(key string) (interface{}, error)
