@@ -71,7 +71,7 @@ func (s *Store) purger(interval time.Duration) {
 	for {
 		select {
 		case <-newTicker.C:
-			if s.FIFO.capacity > s.capacity {
+			for s.FIFO.capacity > s.capacity {
 				s.RWMutex.Lock()
 				defer s.RWMutex.Unlock()
 
