@@ -48,6 +48,7 @@ func GetNewKV(capacity int) *Store {
 	}
 
 	// start the background purger
+	s.wg.Add(1)
 	interval := 5 * time.Second
 	go s.purger(interval)
 
@@ -80,6 +81,7 @@ func (s *Store) purger(interval time.Duration) {
 			}
 		case <-s.shutdown:
 			newTicker.Stop()
+			s.wg.Done()
 			return
 
 		}
