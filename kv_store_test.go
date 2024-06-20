@@ -11,7 +11,7 @@ import (
 )
 
 func TestSetKV(t *testing.T) {
-	store := GetNewKV(1)
+	store := GetStore(1)
 	defer store.Close()
 
 	key := "hello"
@@ -26,7 +26,7 @@ func TestSetKV(t *testing.T) {
 }
 
 func TestGetKV(t *testing.T) {
-	store := GetNewKV(1)
+	store := GetStore(1)
 	defer store.Close()
 
 	key := "hello"
@@ -43,7 +43,7 @@ func TestGetKV(t *testing.T) {
 }
 
 func TestDeleteKV(t *testing.T) {
-	store := GetNewKV(1)
+	store := GetStore(1)
 	defer store.Close()
 
 	key := "hello"
@@ -63,7 +63,7 @@ func TestDeleteKV(t *testing.T) {
 
 func TestKVCapBreach(t *testing.T) {
 	capacity := 4
-	store := GetNewKV(capacity)
+	store := GetStore(capacity)
 	defer store.Close()
 
 	for i := 0; i < capacity; i++ {
@@ -89,7 +89,7 @@ func TestZeroCapKV(t *testing.T) {
 	var f assert.PanicTestFunc
 
 	f = func() {
-		store := GetNewKV(capacity)
+		store := GetStore(capacity)
 		defer store.Close()
 
 		store.Set("hello", "world")
@@ -102,7 +102,7 @@ func TestKVSetRacer(t *testing.T) {
 	capacity := 5
 	var wg sync.WaitGroup
 
-	store := GetNewKV(capacity)
+	store := GetStore(capacity)
 	defer store.Close()
 
 	// set values
@@ -142,7 +142,7 @@ func TestKVDeleteRacer(t *testing.T) {
 	capacity := 5
 	var wg sync.WaitGroup
 
-	store := GetNewKV(capacity)
+	store := GetStore(capacity)
 	defer store.Close()
 
 	// set values

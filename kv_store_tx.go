@@ -8,10 +8,10 @@ type StoreWithTx struct {
 
 var _ StoreIface = (*StoreWithTx)(nil)
 
-func getStoreWithTx(capacity int) *StoreWithTx {
+func GetStoreWithTx(capacity int) *StoreWithTx {
 	return &StoreWithTx{
 		// initialise the global state.
-		store: GetNewKV(capacity),
+		store: GetStore(capacity),
 	}
 }
 

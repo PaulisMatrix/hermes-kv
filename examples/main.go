@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	s := hermeskv.GetNewKV(2)
+	s := hermeskv.GetStore(2)
 	defer s.Close()
 
 	s.Set("hello", "world")

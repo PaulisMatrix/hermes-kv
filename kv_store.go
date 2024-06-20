@@ -30,7 +30,7 @@ type StoreIface interface {
 
 var _ StoreIface = (*Store)(nil)
 
-func GetNewKV(capacity int) *Store {
+func GetStore(capacity int) *Store {
 	if capacity <= 0 {
 		panic("cache capacity cant be zero")
 	}
