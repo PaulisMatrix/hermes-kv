@@ -76,6 +76,10 @@ func (stx *StoreWithTx) Delete(key string) error {
 
 }
 
+func (stx *StoreWithTx) Close() {
+	stx.store.Close()
+}
+
 func (stx *StoreWithTx) Begin() {
 	// when begin is called, record all the operations of the ongoing tx
 	// mark the current tx as active

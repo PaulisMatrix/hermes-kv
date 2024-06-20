@@ -1,7 +1,9 @@
 package hermeskv
 
 import (
+	"log"
 	"sync"
+	"time"
 )
 
 type ValMetaDeta struct {
@@ -11,6 +13,8 @@ type ValMetaDeta struct {
 type Store struct {
 	// store the key value pairs
 	sync.RWMutex
+	wg          *sync.WaitGroup
+	shutdown    chan struct{}
 	globalState map[string]*ValMetaDeta
 	FIFO        *DoublyLinkedList
 	capacity    int
@@ -21,6 +25,7 @@ type StoreIface interface {
 	Set(key string, value interface{}) error
 	Get(key string) (interface{}, error)
 	Delete(key string) error
+	Close()
 }
 
 var _ StoreIface = (*Store)(nil)
@@ -38,8 +43,48 @@ func GetNewKV(capacity int) *Store {
 		FIFO:        getDLL(),
 		capacity:    capacity,
 		RWMutex:     sync.RWMutex{},
+		shutdown:    make(chan struct{}),
+		wg:          &sync.WaitGroup{},
 	}
+
+	// start the background purger
+	interval := 5 * time.Second
+	go s.purger(interval)
+
 	return s
+}
+
+// clean up old entries by checking the capacity has been breached at regular intervals
+// there is a possibility that we can end up adding more entries than the current capacity if the purger hasn't cleaned up yet
+// but thats fine cause eventually they will be deleted.
+
+// well no, eventual consistent seems to be problem here cause the in-memory operations(set,get,delete) are quite fast.
+// we can't guarantee when and if the purger goroutine runs and deletes the head node which leads to inconsistent results.
+
+// this is similar to redis's background thread evicting the entries according to the set policy.
+// but the only hard limit for redis is the underlying RAM so redis can use more RAM than available but EVENTUALLY it will clean up the old entries.
+
+func (s *Store) purger(interval time.Duration) {
+	newTicker := time.NewTicker(interval)
+
+	for {
+		select {
+		case <-newTicker.C:
+			if s.FIFO.capacity > s.capacity {
+				s.RWMutex.Lock()
+				defer s.RWMutex.Unlock()
+
+				log.Println("capacity breached. deleting the head node")
+				node := s.FIFO.deleteHead()
+				delete(s.globalState, node.key)
+			}
+		case <-s.shutdown:
+			newTicker.Stop()
+			return
+
+		}
+	}
+
 }
 
 func (s *Store) Set(key string, value interface{}) error {
@@ -49,7 +94,6 @@ func (s *Store) Set(key string, value interface{}) error {
 
 	// check the cur len > capacity, delete the head node.
 	if s.FIFO.capacity >= s.capacity {
-		// TODO: can we do this in a background thread?
 		// evict the head node and update the capacity
 		node := s.FIFO.deleteHead()
 		delete(s.globalState, node.key)
@@ -98,4 +142,10 @@ func (s *Store) Delete(key string) error {
 	s.FIFO.deleteNode(node)
 
 	return nil
+}
+
+// equivalent to closing a connection. useful in graceful shutdowns
+func (s *Store) Close() {
+	close(s.shutdown)
+	s.wg.Wait()
 }

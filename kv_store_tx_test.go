@@ -17,6 +17,8 @@ func TestSet1KVWithTx(t *testing.T) {
 	//   * Expect an error case as key2 is not set
 	capacity := 10
 	storeWithTx := getStoreWithTx(capacity)
+	defer storeWithTx.Close()
+
 	storeWithTx.Begin()
 
 	storeWithTx.Set("key2", "val2")
@@ -50,6 +52,8 @@ func TestSet2KVWithTx(t *testing.T) {
 
 	capacity := 10
 	storeWithTx := getStoreWithTx(capacity)
+	defer storeWithTx.Close()
+
 	storeWithTx.Set("key0", "val0")
 	val, err := storeWithTx.Get("key0")
 	require.Nil(t, err)
@@ -92,6 +96,7 @@ func TestDelete1KVWithTx(t *testing.T) {
 	capacity := 10
 	expectedError := ErrNoKey
 	storeWithTx := getStoreWithTx(capacity)
+	defer storeWithTx.Close()
 
 	storeWithTx.Set("key0", "val0")
 	val, err := storeWithTx.Get("key0")

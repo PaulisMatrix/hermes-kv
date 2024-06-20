@@ -8,6 +8,7 @@ import (
 
 func main() {
 	s := hermeskv.GetNewKV(2)
+	defer s.Close()
 
 	s.Set("hello", "world")
 	s.Set("first", 100)
