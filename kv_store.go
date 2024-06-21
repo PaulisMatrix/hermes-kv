@@ -95,7 +95,7 @@ func (s *Store) Set(key string, value interface{}) error {
 	defer s.RWMutex.Unlock()
 
 	// check the cur len > capacity, delete the head node.
-	if s.FIFO.capacity >= s.capacity {
+	for s.FIFO.capacity >= s.capacity {
 		// evict the head node and update the capacity
 		node := s.FIFO.deleteHead()
 		delete(s.globalState, node.key)

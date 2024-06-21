@@ -23,9 +23,8 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
 **KV store with transactions:**
 
 * Basic assumptions:
-  1. Only one transaction can be issued at a time. Assume no concurrent transactions.
-  2. `commit()` or `rollback` can be called only once in a transaction. You can specify n number of operations in between enclosed in between `begin()` and `end()`
-  3. Let's not consider nested transactions for now.
+  1. `commit()` or `rollback` can be called only once in a transaction. You can specify n number of operations in between enclosed in between `begin()` and `end()`
+  2. Let's not consider nested transactions for now.
 
 * Implementation details:
   1. Maintain a `tempKVMap` recording all the db changes. 
@@ -33,6 +32,10 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
   3. On `rollback()`, delete the `tempKVMap` altogether. 
   4. Use flag `isTxActive` to check which Map to refer whenever any method is called.
   5. For `delete()`, maintain a `isTombStone` boolean to mark a kv pair as deleted in localState. On `commit()`, call the actual `delete()` method to delete it from the globalState. On `rollback()`, nothing needs to be done, just clear the localState.
+
+* Concurrent Transactions:
+  * Concurrent txs. Similar to sqlite. Single writer, multiple readers. Rest of the writers will be blocked until the current active one succeeds. Specify a timeout like [busy_timeout](https://sqlite.org/c3ref/busy_timeout.html) pragma of sqlite, to specify how long the blocked writers should wait.
+  * 
 
 * References:
   1. https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
