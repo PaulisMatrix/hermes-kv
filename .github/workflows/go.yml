@@ -10,12 +10,34 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+
+    - name: checkout code
+      uses: actions/checkout@v4
 
     - name: set up go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.21.1'
+        go-version: '1.23'
+    
+    - name: install dependencies
+      run: go mod tidy
 
     - name: run tests
-      run: go test ./... -race -v -cover
+      run: go test ./... -race -v
+    
+    - name: generate coverage report
+      run: go test -coverprofile=coverage.out ./...
+    
+    - name: check coverage
+      id: coverage
+      run: |
+        coverage=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+        echo "total_coverage=$coverage" >> $GITHUB_OUPUT
+        echo "Coverage: $coverage%"
+    
+    - name: fail if coverage is below threshold
+      run: |
+        if (( $(echo "$total_coverage < 80" | bc -l) )); then
+          echo "Coverage ($total_coverage%) is below the threshold (80%)"
+          exit 1
+        fi
