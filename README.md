@@ -25,6 +25,7 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
 2. Whenever a key is referenced/updated, delete it from the head and insert it at the tail. 
 3. The Least Recently Used key is always at the head of the DLL.
 4. Deleting and Inserting is O(1) since we are maintaining respective head and tail pointers.   
+5. Check [this branch](https://github.com/PaulisMatrix/hermes-kv/tree/LRU) for the implementation.
 
 **KV store with transactions:**
 
