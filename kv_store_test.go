@@ -86,9 +86,7 @@ func TestKVCapBreach(t *testing.T) {
 func TestZeroCapKV(t *testing.T) {
 	capacity := 0
 
-	var f assert.PanicTestFunc
-
-	f = func() {
+	f := func() {
 		store := GetStore(capacity)
 		defer store.Close()
 

@@ -43,13 +43,10 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
 * Concurrent Transactions:
   * Concurrent txs. Similar to sqlite. Single writer, multiple readers. Rest of the writers will be blocked until the current active one succeeds. Specify a timeout like [busy_timeout](https://sqlite.org/c3ref/busy_timeout.html) pragma of sqlite, to specify how long the blocked writers should wait.
   * 
-
-* References:
-  1. https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
-  2. 
   
-**References on In-memory cache:**
+**Similar works/references**
   * https://github.com/patrickmn/go-cache/
+  * https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
   * 
 
 **Misc:**
