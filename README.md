@@ -20,6 +20,12 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
 4.  Doubly linked list for O(1) eviction. Deleting the head which is the first key stored so eligible for eviction.
     Adding a new node is also O(1) since we are maintaining prev pointer in a doubly linked list.
 
+**LRU Eviction Policy:**
+1. Use the same DLL maintained for FIFO.
+2. Whenever a key is referenced/updated, delete it from the head and insert it at the tail. 
+3. The Least Recently Used key is always at the head of the DLL.
+4. Deleting and Inserting is O(1) since we are maintaining respective head and tail pointers.   
+
 **KV store with transactions:**
 
 * Basic assumptions:

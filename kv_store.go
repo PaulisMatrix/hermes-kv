@@ -17,6 +17,7 @@ type Store struct {
 	shutdown    chan struct{}
 	globalState map[string]*ValMetaDeta
 	FIFO        *DoublyLinkedList
+	LRU         *DoublyLinkedList
 	capacity    int
 }
 
@@ -41,6 +42,7 @@ func GetStore(capacity int) *Store {
 	s := &Store{
 		globalState: make(map[string]*ValMetaDeta),
 		FIFO:        getDLL(),
+		LRU:         getDLL(),
 		capacity:    capacity,
 		RWMutex:     sync.RWMutex{},
 		shutdown:    make(chan struct{}),
@@ -55,7 +57,7 @@ func GetStore(capacity int) *Store {
 	return s
 }
 
-// clean up old entries by checking the capacity has been breached at regular intervals
+// clean up old entries by checking the capacity has been breached at regular intervals when some TTL is set on the keys.
 // there is a possibility that we can end up adding more entries than the current capacity if the purger hasn't cleaned up yet
 // but thats fine cause eventually they will be deleted.
 
@@ -71,12 +73,12 @@ func (s *Store) purger(interval time.Duration) {
 	for {
 		select {
 		case <-newTicker.C:
-			for s.FIFO.capacity > s.capacity {
+			for s.LRU.capacity > s.capacity {
 				s.RWMutex.Lock()
 				defer s.RWMutex.Unlock()
 
 				log.Println("capacity breached. deleting the head node")
-				node := s.FIFO.deleteHead()
+				node := s.LRU.deleteHead()
 				delete(s.globalState, node.key)
 			}
 		case <-s.shutdown:
@@ -95,15 +97,15 @@ func (s *Store) Set(key string, value interface{}) error {
 	defer s.RWMutex.Unlock()
 
 	// check the cur len > capacity, delete the head node.
-	for s.FIFO.capacity >= s.capacity {
+	for s.LRU.capacity >= s.capacity {
 		// evict the head node and update the capacity
-		node := s.FIFO.deleteHead()
+		node := s.LRU.deleteHead()
 		delete(s.globalState, node.key)
 	}
 
 	// add node to the DLL
 	node := getNode(key, value, nil, nil)
-	newNode := s.FIFO.addNode(node)
+	newNode := s.LRU.addNode(node)
 	s.globalState[key] = &ValMetaDeta{
 		// for globalState, value is the node reference in the doubly linked list.
 		value:       newNode,
@@ -113,10 +115,11 @@ func (s *Store) Set(key string, value interface{}) error {
 	return nil
 }
 
+// for LRU, whenever a key is referenced/updated, move that key from front to the back of the DLL.
 func (s *Store) Get(key string) (interface{}, error) {
 	// shared reader lock for accessing the cache
-	s.RWMutex.RLock()
-	defer s.RWMutex.RUnlock()
+	s.RWMutex.Lock()
+	defer s.RWMutex.Unlock()
 
 	valMeta, ok := s.globalState[key]
 
@@ -125,6 +128,11 @@ func (s *Store) Get(key string) (interface{}, error) {
 	}
 
 	node := valMeta.value.(*Node)
+
+	// update the DLL
+	s.LRU.deleteNode(node)
+	s.LRU.addNode(node)
+
 	return node.val, nil
 }
 
@@ -141,7 +149,7 @@ func (s *Store) Delete(key string) error {
 
 	// for the globalState, we aren't marking it as a tombStone but actually deleting it.
 	delete(s.globalState, key)
-	s.FIFO.deleteNode(node)
+	s.LRU.deleteNode(node)
 
 	return nil
 }

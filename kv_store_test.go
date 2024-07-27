@@ -98,6 +98,26 @@ func TestZeroCapKV(t *testing.T) {
 	require.Panics(t, f)
 }
 
+func TestKVLRU(t *testing.T) {
+	capacity := 4
+	store := GetStore(capacity)
+	defer store.Close()
+
+	for i := 0; i < capacity; i++ {
+		key := fmt.Sprintf("key:%d", i)
+		val := fmt.Sprintf("value:%d", i)
+
+		store.Set(key, val)
+	}
+
+	store.Get("key:0")
+
+	// head key must be key1
+	headNode := store.LRU.getHead()
+	assert.EqualValues(t, "key:1", headNode.key)
+	assert.EqualValues(t, "value:1", headNode.val)
+}
+
 func TestKVSetRacer(t *testing.T) {
 	capacity := 5
 	var wg sync.WaitGroup

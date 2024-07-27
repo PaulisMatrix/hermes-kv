@@ -115,3 +115,7 @@ func (dll *DoublyLinkedList) deleteNode(node *Node) {
 		node.next.prev = node.prev
 	}
 }
+
+func (dll *DoublyLinkedList) getHead() *Node {
+	return dll.headNode.next
+}
