@@ -29,25 +29,34 @@ Cause Hermes is the Greek god of commerce, communication, and the messenger of t
 
 **KV store with transactions:**
 
-* Basic assumptions:
-  1. `commit()` or `rollback` can be called only once in a transaction. You can specify n number of operations in between enclosed in between `begin()` and `end()`
-  2. Let's not consider nested transactions for now.
+Basic assumptions:
+1. `commit()` or `rollback` can be called only once in a transaction. You can specify n number of operations in between enclosed in between `begin()` and `end()`
+2. Let's not consider nested transactions for now.
 
-* Implementation details:
-  1. Maintain a `tempKVMap` recording all the db changes. 
-  2. On `commit()`, iterate over all k,v pairs `O(N)` and call `Set(k, v)` of the underlying main KV store to record the final changes.
-  3. On `rollback()`, delete the `tempKVMap` altogether. 
-  4. Use flag `isTxActive` to check which Map to refer whenever any method is called.
-  5. For `delete()`, maintain a `isTombStone` boolean to mark a kv pair as deleted in localState. On `commit()`, call the actual `delete()` method to delete it from the globalState. On `rollback()`, nothing needs to be done, just clear the localState.
+Implementation details:
+1. Maintain a `tempKVMap` recording all the db changes. 
+2. On `commit()`, iterate over all k,v pairs `O(N)` and call `Set(k, v)` of the underlying main KV store to record the final changes.
+3. On `rollback()`, delete the `tempKVMap` altogether. 
+4. Use flag `isTxActive` to check which Map to refer whenever any method is called.
+5. For `delete()`, maintain a `isTombStone` boolean to mark a kv pair as deleted in localState. On `commit()`, call the actual `delete()` method to delete it from the globalState. On `rollback()`, nothing needs to be done, just clear the localState.
 
-* Concurrent Transactions:
-  * Concurrent txs. Similar to sqlite. Single writer, multiple readers. Rest of the writers will be blocked until the current active one succeeds. Specify a timeout like [busy_timeout](https://sqlite.org/c3ref/busy_timeout.html) pragma of sqlite, to specify how long the blocked writers should wait.
-  * 
+**Concurrent Transactions:**
+Snapshot isolation with LWW to resolve the conflicts - 
+1. Whenever a tx starts, it gets its own copy of the `globalStateMap`. Multiple txs can modify their own `localStateMap`. This is concurrent safe cause each have their own copy. 
+2. On `commit()`, if one or more tx has modified the same value then the latest update will be committed to the global state i.e Last Write Wins. 
+3. Each update to a key is timestamped so we will pick the latest timestamp for conflict resolution.
+4. This works well but guarantee upto date updates due to clock skews. 
+
+Multiple readers, Single writer - 
+1. Concurrent txs. Similar to sqlite. Single writer, multiple readers. Rest of the writers will be blocked until the current active one succeeds. Specify a timeout like [busy_timeout](https://sqlite.org/c3ref/busy_timeout.html) pragma of sqlite, to specify how long the blocked writers should wait.
+2. 
   
 **Similar works/references**
-  * https://github.com/patrickmn/go-cache/
-  * https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
-  * 
+* https://github.com/patrickmn/go-cache/
+* https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
+* Implementating different consistency/isolation levels: 
+    * Phil's(EDB-Postgres) (blog post)[https://notes.eatonphil.com/2024-05-16-mvcc.html]
+    * Jesse's(MongoDB) (blog post)[https://emptysqua.re/blog/pycon-2023-consistency-isolation/]
 
 **Misc:**
 ```
