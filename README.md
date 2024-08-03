@@ -55,8 +55,8 @@ Multiple readers, Single writer -
 * https://github.com/patrickmn/go-cache/
 * https://www.freecodecamp.org/news/design-a-key-value-store-in-go/
 * Implementating different consistency/isolation levels: 
-    * Phil's(EDB-Postgres) (blog post)[https://notes.eatonphil.com/2024-05-16-mvcc.html]
-    * Jesse's(MongoDB) (blog post)[https://emptysqua.re/blog/pycon-2023-consistency-isolation/]
+    * Phil's(EDB-Postgres) [blog post](https://notes.eatonphil.com/2024-05-16-mvcc.html)
+    * Jesse's(MongoDB) [blog post](https://emptysqua.re/blog/pycon-2023-consistency-isolation/)
 
 **Misc:**
 ```
